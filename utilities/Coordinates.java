@@ -9,8 +9,21 @@ public class Coordinates {
         this.y = y;
     }
 
-    public int getX() { return x; }
-    public int getY() { return y; }
+    public int getX() {
+        return x;
+    }
+    public int getY() {
+        return y;
+    }
+
+    // Methods to set a pos for Entity
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
 
 
     public boolean isAdjacentTo(Coordinates other) {
