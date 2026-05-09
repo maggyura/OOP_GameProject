@@ -1,11 +1,10 @@
 package Entities;
 
-import world.World;
 import StructuralElements.Room;
 import utilities.Coordinates;
-import utilities.Executable;
+import world.World;
 
-public class Zombie extends LivingBeing implements Executable {
+public class Villain extends LivingBeing implements Executable {
     private Room spawnRoom;
     private int respawnTimer;
     private boolean isRespawning;
