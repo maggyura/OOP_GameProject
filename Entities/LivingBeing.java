@@ -2,7 +2,7 @@ package Entities;
 
 import world.World;
 import StructuralElements.Room;
-
+import utilities.Coordinates;
 
 public abstract class LivingBeing extends Entity {
     protected int health;
@@ -11,8 +11,8 @@ public abstract class LivingBeing extends Entity {
     protected Room currentRoom;
     protected boolean isAlive;
 
-    public LivingBeing(String name, World world, int health, int strength) {
-        super(name, world);
+    public LivingBeing(String name, World world, int health, int strength, Coordinates coordinates) {
+        super(name, world, coordinates);
         this.health = health;
         this.maxHealth = health;
         this.strength = strength;
@@ -25,6 +25,9 @@ public abstract class LivingBeing extends Entity {
             currentRoom.removeOccupant(this);
         }
         currentRoom = destination;
+        //replacing coordinates of an entity with coordinates of the room
+        this.coordinates = destination.getCoordinates();
+
         destination.addOccupant(this);
     }
 
@@ -54,6 +57,7 @@ public abstract class LivingBeing extends Entity {
     public void heal(int amount) {
         if (!isAlive) return;
         health = Math.min(health + amount, maxHealth);
+    }
     
     protected void die() {
         isAlive = false;

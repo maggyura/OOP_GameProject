@@ -1,5 +1,6 @@
 package Entities;
 
+import utilities.Coordinates;
 import world.World;
 import GameObjects.GameObject;
 import GameObjects.Key;
@@ -16,8 +17,8 @@ import java.util.List;
 public class Hero extends LivingBeing {
     private List<GameObject> inventory;
 
-    public Hero(String name, World world) {
-        super(name, world, 100, 15); // 100 HP, 15 сила
+    public Hero(String name, World world, Coordinates coordinates) {
+        super(name, world,100, 15,  coordinates); // 100 HP, 15 сила
         this.inventory = new ArrayList<>();
         world.addLivingBeing(this);
     }

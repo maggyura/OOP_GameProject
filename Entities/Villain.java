@@ -1,0 +1,65 @@
+package Entities;
+
+import world.World;
+import StructuralElements.Room;
+import utilities.Coordinates;
+import utilities.Executable;
+
+public class Villain extends LivingBeing implements Executable {
+    private Room spawnRoom;
+    private int respawnTimer;
+    private boolean isRespawning;
+
+    //const respawn time
+    private final int RESPAWN_TIME = 10;
+    public Villain(String name, World world, Coordinates coordinates, int health, int strength, Room spawnRoom) {
+
+        super(name, world, 50, strength, coordinates);
+        this.spawnRoom = spawnRoom;
+        this.isRespawning = false;
+    }
+    //respawn method for enemy
+    public void respawn() {
+        respawnTimer++;
+        if (respawnTimer >= RESPAWN_TIME) {
+            this.health = maxHealth;
+            this.isAlive = true;
+            this.isRespawning = false;
+            this.respawnTimer = 0;
+
+            // zombie returns to the initial room
+            move(spawnRoom);
+            System.out.println(name + " respawned in room " + spawnRoom.getIDroom() + "!");
+        }
+        else {
+            System.out.println(name + " is respawning (Left: " + (RESPAWN_TIME - respawnTimer) + ")");
+        }
+    }
+
+    public boolean isRespawning() {
+        return isRespawning;
+    }
+
+    //ai of the villain to chase after the hero
+    public void chase() {
+        if (!isAlive)
+            return;
+        System.out.println(name + " is chasing after you!");
+    }
+
+    // cycle of life of zombie
+    @Override
+    public void execute() {
+        if (isAlive) {
+            chase();
+        } else if (isRespawning) {
+            respawn();
+        }
+    }
+    // death and respawn
+    @Override
+    protected void die() {
+        super.die(); // Стандартное удаление из комнаты
+        this.isRespawning = true;
+    }
+}
