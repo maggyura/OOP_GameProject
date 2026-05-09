@@ -12,10 +12,11 @@ public class Villain extends LivingBeing implements Executable {
 
     //const respawn time
     private final int RESPAWN_TIME = 10;
-    public Villain(String name, World world, Coordinates coordinates, int health, int strength, Room spawnRoom) {
-
-        super(name, world, 50, strength, coordinates);
+    public Villain(String name, World world, Coordinates coordinates,
+                   int health, int strength, Room spawnRoom) {
+        super(name, world, health, strength, coordinates); // ← было 50, теперь параметр
         this.spawnRoom = spawnRoom;
+        this.respawnTimer = 0;
         this.isRespawning = false;
     }
     //respawn method for enemy
@@ -41,21 +42,56 @@ public class Villain extends LivingBeing implements Executable {
     }
 
     //ai of the villain to chase after the hero
-    public void chase() {
-        if (!isAlive)
+    public void chase(Hero hero) {
+        if (!isAlive || hero == null || !hero.isAlive()) return;
+
+        Room heroRoom = hero.getCurrentRoom();
+        if (heroRoom == null || currentRoom == null) return;
+
+        // если уже в одной комнате — атакуем
+        if (currentRoom.equals(heroRoom)) {
+            System.out.println(name + " атакует!");
+            attack(hero);
             return;
-        System.out.println(name + " is chasing after you!");
+        }
+
+        // ищем соседнюю комнату ближе к герою
+        Room best = null;
+        double bestDist = distance(currentRoom, heroRoom);
+
+        for (Room neighbor : currentRoom.getAccessibleRooms()) {
+            double d = distance(neighbor, heroRoom);
+            if (d < bestDist) {
+                bestDist = d;
+                best = neighbor;
+            }
+        }
+
+        if (best != null) {
+            move(best);
+            System.out.println(name + " движется в комнату #" + best.getIDroom());
+        } else {
+            System.out.println(name + " не может добраться до героя!");
+        }
     }
+
+    private double distance(Room a, Room b) {
+        int dx = a.getCoordinates().getX() - b.getCoordinates().getX();
+        int dy = a.getCoordinates().getY() - b.getCoordinates().getY();
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+    private Hero targetHero; // задаётся при создании или через сеттер
 
     // cycle of life of zombie
     @Override
     public void execute() {
         if (isAlive) {
-            chase();
+            chase(targetHero); // ← теперь аргумент есть
         } else if (isRespawning) {
             respawn();
         }
     }
+
     // death and respawn
     @Override
     protected void die() {

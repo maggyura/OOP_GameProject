@@ -58,14 +58,12 @@ public abstract class LivingBeing extends Entity {
         if (!isAlive) return;
         health = Math.min(health + amount, maxHealth);
     }
-    
+
     protected void die() {
         isAlive = false;
         if (currentRoom != null) {
             currentRoom.removeOccupant(this);
         }
-        world.removeLivingBeing(this);
-        System.out.println(name + " погиб!");
     }
 
     
