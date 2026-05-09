@@ -3,12 +3,12 @@ package GameObjects;
 import utilities.Activatable;
 import java.util.ArrayList;
 import java.util.List;
+import Entities.Hero;
 
 public class Chest extends GameObject implements Activatable {
     private boolean isLocked;
     private boolean isOpen;
-    private List<GameObject> inventory; // Можно заменить на массив Item[], если он у тебя есть
-
+    private List<GameObject> inventory;
     public Chest(String name, boolean isLocked) {
         super(name, false);
         this.isLocked = isLocked;
@@ -57,6 +57,5 @@ public class Chest extends GameObject implements Activatable {
         }
         inventory.clear(); //clearing chest
     }
-}
 }
 }
