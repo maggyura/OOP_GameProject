@@ -1,17 +1,14 @@
 package Entities;
 
-import utilities.Coordinates;
-import world.World;
+import GameObjects.Crowbar;
 import GameObjects.GameObject;
 import GameObjects.Key;
 import GameObjects.Knife;
-import GameObjects.Crowbar;
-import GameObjects.FirstAidKit;
-import StructuralElements.Door;
-import utilities.Activatable;
-
 import java.util.ArrayList;
 import java.util.List;
+import utilities.Activatable;
+import utilities.Coordinates;
+import world.World;
 
 
 public class Hero extends LivingBeing {
@@ -21,6 +18,12 @@ public class Hero extends LivingBeing {
         super(name, world,100, 15,  coordinates); // 100 HP, 15 сила
         this.inventory = new ArrayList<>();
         world.addLivingBeing(this);
+    }
+
+    @Override
+    public void execute(){
+        if (!isAlive) 
+            return;
     }
 
     //using GameObjects
