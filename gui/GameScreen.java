@@ -8,10 +8,10 @@ import javax.imageio.ImageIO;
 import java.util.HashSet;
 import java.util.Set;
 
+import Entities.Zombie;
 import world.World;
 import Entities.Hero;
 import StructuralElements.Room;
-import Entities.Villain;
 import Entities.LivingBeing;
 
 public class GameScreen extends JPanel {
@@ -104,7 +104,7 @@ public class GameScreen extends JPanel {
 
         // villains
         for (LivingBeing being : world.getLivingBeings()) {
-            if (being instanceof Villain && being.isAlive()) {
+            if (being instanceof Zombie && being.isAlive()) {
                 int vx = being.getPosition().getX() * TILE_SIZE;
                 int vy = being.getPosition().getY() * TILE_SIZE;
                 g.drawImage(villainSprite, vx, vy, TILE_SIZE, TILE_SIZE, this);
