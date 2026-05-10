@@ -112,7 +112,7 @@ public class GameScreen extends JPanel {
                 processInput();
                 moveTimer = 0;
             }
-            if (zombieMoveTimer >= 1.2) {
+            if (zombieMoveTimer >= 1.5) {
                 world.tick();
                 zombieMoveTimer = 0;
             }
