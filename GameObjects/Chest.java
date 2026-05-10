@@ -51,4 +51,11 @@ public class Chest extends GameObject implements Activatable {
         return items;
     
 }
+
+    public boolean isOpen()   {
+        return isOpen;
+    }
+    public boolean isLocked() {
+        return isLocked;
+    }
 }
