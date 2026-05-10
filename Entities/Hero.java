@@ -109,8 +109,4 @@ public class Hero extends LivingBeing {
             }
         }
     }
-    @Override
-    // hero is controlled by a user
-    public void execute() {
-    }
 }

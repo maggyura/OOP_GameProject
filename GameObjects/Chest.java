@@ -1,8 +1,8 @@
 package GameObjects;
 
-import utilities.Activatable;
 import java.util.ArrayList;
 import java.util.List;
+import utilities.Activatable;
 
 public class Chest extends GameObject implements Activatable {
     private boolean isLocked;
@@ -14,6 +14,13 @@ public class Chest extends GameObject implements Activatable {
         this.isOpen = false;
         this.contents = new ArrayList<>();
     }
+
+public Chest(String name, boolean isLocked, boolean isOpen) {
+    super(name, false);
+    this.isLocked = isLocked;
+    this.isOpen = isOpen;
+    this.contents = new ArrayList<>();
+}    
 
     @Override
     public boolean activate(GameObject item) {
@@ -36,6 +43,10 @@ public class Chest extends GameObject implements Activatable {
         System.out.println("You've broke the chest using crowbar!");
         return true;
     }
+
+    public void addItem(GameObject item) {
+    contents.add(item);
+}
 
     public List<GameObject> takeAll() {
         if (!isOpen) {
