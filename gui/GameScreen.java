@@ -42,6 +42,7 @@ public class GameScreen extends JPanel {
     private Set<Integer> pressedKeys = new HashSet<>();
     private double moveTimer = 0;
     private double zombieMoveTimer = 0;
+    private boolean gameLost = false;
 
     //attack animation
     private boolean isAttacking = false;
@@ -96,9 +97,14 @@ public class GameScreen extends JPanel {
     }
 
     public void startLoop() {
+
         new Timer(16, e -> {
             moveTimer += 0.016;
             zombieMoveTimer += 0.016;
+
+        if (!hero.isAlive()) {
+            gameLost = true;
+        }            
 
             if (isAttacking) {
                 attackTimer += 0.016;
@@ -121,6 +127,7 @@ public class GameScreen extends JPanel {
     }
 
     private void processInput() {
+        if (gameLost) return;
         if (gameWon) return;
 
         Room current = hero.getCurrentRoom();
@@ -397,5 +404,25 @@ public class GameScreen extends JPanel {
             int subX = (COLS * TILE_SIZE - fm2.stringWidth(sub)) / 2;
             g.drawString(sub, subX, msgY + 50);
         }
+
+        //if u lost
+        if (gameLost) {
+            g.setColor(new Color(0, 0, 0, 180));
+            g.fillRect(0, 0, getWidth(), getHeight());
+            g.setColor(Color.RED);
+            g.setFont(new Font("Arial", Font.BOLD, 64));
+            String msg = "YOU DIED!";
+            FontMetrics fm = g.getFontMetrics();
+            int msgX = (COLS * TILE_SIZE - fm.stringWidth(msg)) / 2;
+            int msgY = (ROWS * TILE_SIZE) / 2;
+            g.drawString(msg, msgX, msgY);
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("Arial", Font.PLAIN, 24));
+            String sub = "Press ESC to exit";
+            FontMetrics fm2 = g.getFontMetrics();
+            int subX = (COLS * TILE_SIZE - fm2.stringWidth(sub)) / 2;
+            g.drawString(sub, subX, msgY + 50);
+        }
+
     }
 }
