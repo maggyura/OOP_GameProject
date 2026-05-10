@@ -64,9 +64,20 @@ public class GameStarter {
 
         hero.move(grid[0][1]);
 
+        //zombi1 behind hero
         Zombie z = new Zombie("Zombie", world, new Coordinates(0, 0), 50, 10, grid[0][0], hero);
         z.move(grid[0][0]);
         world.addLivingBeing(z);
+
+        //zombi 2 in the right top conrer, middle brother
+        Zombie z2 = new Zombie("Zombie 2", world, new Coordinates(COLS-1, 0), 50, 10, grid[0][COLS-1], hero);
+        z2.move(grid[0][COLS-1]);
+        world.addLivingBeing(z2);
+
+        //zombi 3 in the center, stroger and hekthier than his brothers
+        Zombie z3 = new Zombie("Zombie 3", world, new Coordinates(COLS/2, ROWS/2), 70, 12, grid[ROWS/2][COLS/2], hero);
+        z3.move(grid[ROWS/2][COLS/2]);
+        world.addLivingBeing(z3);
 
         JFrame frame = new JFrame("ZombieGame");
         GameScreen screen = new GameScreen(world, hero, isPartOfBigRoom, bigRoomDoors);
@@ -84,13 +95,13 @@ public class GameStarter {
         int placed = 0;
         int attempts = 0;
 
-        while (placed < 3 && attempts < 100) {
+        while (placed < 5 && attempts < 200) {
             attempts++;
-            //размер 2x2 или 3x3
-            int size = rand.nextBoolean() ? 4 : 5;
+            //размер 3х3 или 4x4
+            int size = rand.nextBoolean() ? 3 : 4;
             //рандомная позиция (не у края и не у старта героя) хотя можно подумать
-            int startRow = 4 + rand.nextInt(ROWS - size - 5);
-            int startCol = 4 + rand.nextInt(COLS - size - 5);
+            int startRow = 3 + rand.nextInt(ROWS - size - 4);
+            int startCol = 3 + rand.nextInt(COLS - size - 4);
 
             //проверяем что место свободно
             boolean free = true;
@@ -177,7 +188,7 @@ public class GameStarter {
         allRooms.get(0).addItem(openChest);
 
         //от 5 до 7 закрытых сундуков
-        int closedCount = 5 + rand.nextInt(3);
+        int closedCount = 8 + rand.nextInt(5);
         for (int i = 1; i <= closedCount; i++) {
             Chest chest = new Chest("Chest", true);
             if (rand.nextBoolean()) {
