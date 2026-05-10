@@ -11,7 +11,7 @@ import java.util.Set;
 import world.World;
 import Entities.Hero;
 import StructuralElements.Room;
-import Entities.Villain;
+import Entities.Zombie;
 import Entities.LivingBeing;
 import GameObjects.GameObject;
 import GameObjects.Chest;
@@ -110,6 +110,13 @@ public class GameScreen extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        //floor
+        for (int x = 0; x < getWidth(); x += TILE_SIZE) {
+            for (int y = 0; y < getHeight(); y += TILE_SIZE) {
+                g.drawImage(floorSprite, x, y, TILE_SIZE, TILE_SIZE, this);
+            }
+        }
+
         // rooms
         for (Room room : world.getRooms()) {
             int x = room.getCoordinates().getX() * TILE_SIZE;
@@ -132,6 +139,7 @@ public class GameScreen extends JPanel {
                 }
             }
         }
+
         // hero
         int hx = hero.getPosition().getX() * TILE_SIZE;
         int hy = hero.getPosition().getY() * TILE_SIZE;
@@ -139,7 +147,7 @@ public class GameScreen extends JPanel {
 
         // villains
         for (LivingBeing being : world.getLivingBeings()) {
-            if (being instanceof Villain && being.isAlive()) {
+            if (being instanceof Zombie && being.isAlive()) {
                 int vx = being.getPosition().getX() * TILE_SIZE;
                 int vy = being.getPosition().getY() * TILE_SIZE;
                 g.drawImage(villainSprite, vx, vy, TILE_SIZE, TILE_SIZE, this);
