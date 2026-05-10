@@ -5,21 +5,24 @@ import StructuralElements.Room;
 import utilities.Coordinates;
 import utilities.Executable;
 
-public class Villain extends LivingBeing implements Executable {
+public class Zombie extends LivingBeing implements Executable {
     private Room spawnRoom;
     private int respawnTimer;
     private boolean isRespawning;
+    private Hero targetHero; 
 
     //const respawn time
     private final int RESPAWN_TIME = 10;
-    public Villain(String name, World world, Coordinates coordinates,
+
+    public Zombie(String name, World world, Coordinates coordinates,
                    int health, int strength, Room spawnRoom) {
         super(name, world, health, strength, coordinates); // ← было 50, теперь параметр
         this.spawnRoom = spawnRoom;
         this.respawnTimer = 0;
         this.isRespawning = false;
+        this.targetHero = targetHero;
     }
-    //respawn method for enemy
+    //respawn method for zombie
     public void respawn() {
         respawnTimer++;
         if (respawnTimer >= RESPAWN_TIME) {
@@ -80,7 +83,7 @@ public class Villain extends LivingBeing implements Executable {
         int dy = a.getCoordinates().getY() - b.getCoordinates().getY();
         return Math.sqrt(dx * dx + dy * dy);
     }
-    private Hero targetHero; // задаётся при создании или через сеттер
+    
 
     // cycle of life of zombie
     @Override
