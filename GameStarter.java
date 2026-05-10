@@ -5,6 +5,7 @@ import GameObjects.Crowbar;
 import GameObjects.FirstAidKit;
 import GameObjects.Key;
 import GameObjects.Knife;
+import GameObjects.Lock;
 import StructuralElements.Door;
 import StructuralElements.Room;
 import gui.GameScreen;
@@ -18,8 +19,8 @@ import utilities.Coordinates;
 import world.World;
 
 public class GameStarter {
-    static int COLS = 30;
-    static int ROWS = 17;
+    static int COLS = 20;
+    static int ROWS = 15;
     static Room[][] grid;
     static int doorId = 1;
     static boolean[][] isPartOfBigRoom;
@@ -54,6 +55,11 @@ public class GameStarter {
         }
         generateMaze(0, 0, visited);
 
+        //выходная комната после которой побюеда
+        Room exitRoom = new Room(id++, "Exit", new Coordinates(COLS, ROWS - 1));
+        world.addRoom(exitRoom);
+        new Door(doorId++, "Exit Door", grid[ROWS-1][COLS-1], exitRoom, null);
+
         generateChests();
 
         hero.move(grid[0][1]);
@@ -81,10 +87,10 @@ public class GameStarter {
         while (placed < 3 && attempts < 100) {
             attempts++;
             //размер 2x2 или 3x3
-            int size = rand.nextBoolean() ? 2 : 3;
+            int size = rand.nextBoolean() ? 4 : 5;
             //рандомная позиция (не у края и не у старта героя) хотя можно подумать
-            int startRow = 2 + rand.nextInt(ROWS - size - 3);
-            int startCol = 2 + rand.nextInt(COLS - size - 3);
+            int startRow = 4 + rand.nextInt(ROWS - size - 5);
+            int startCol = 4 + rand.nextInt(COLS - size - 5);
 
             //проверяем что место свободно
             boolean free = true;
@@ -129,8 +135,7 @@ public class GameStarter {
             int exitRow = startRow + size - 1;
             int exitCol = startCol + size;
             if (exitCol < COLS) {
-                new Door(doorId++, "Door", grid[exitRow][startCol + size - 1], grid[exitRow][exitCol], null);
-                bigRoomDoors.add(new int[]{exitRow, exitCol, 1}); // 1 = закрытая
+                new Door(doorId++, "Door", grid[exitRow][startCol + size - 1], grid[exitRow][exitCol], new Lock(true));                bigRoomDoors.add(new int[]{exitRow, exitCol, 1}); // 1 = закрытая
             }
 
             placed++;

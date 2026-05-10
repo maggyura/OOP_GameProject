@@ -23,18 +23,22 @@ public Chest(String name, boolean isLocked, boolean isOpen) {
 }    
 
     @Override
-    public boolean activate(GameObject item) {
-        if (isOpen) {
-            System.out.println("Chest is already open.");
-            return true;
-        }
-        
-        if (item instanceof Crowbar) {
-            return forceOpen();
-        }
-
-        System.out.println("Chest is locked.");
-        return false;
+        public boolean activate(GameObject item) {
+            if (isOpen) {
+                System.out.println("Chest is already open.");
+                return true;
+            }
+            if (item instanceof Crowbar) {
+                return forceOpen();
+            }
+            if (item instanceof Key) {
+                this.isLocked = false;
+                this.isOpen = true;
+                System.out.println("Chest opened with key!");
+                return true;
+            }
+            System.out.println("Chest is locked.");
+            return false;
     }
 
     public boolean forceOpen() {
