@@ -1,10 +1,11 @@
 package Entities;
 
-import world.World;
 import StructuralElements.Room;
 import utilities.Coordinates;
+import utilities.Executable;
+import world.World;
 
-public abstract class LivingBeing extends Entity {
+public abstract class LivingBeing extends Entity implements Executable{
     protected int health;
     protected int maxHealth;
     protected int strength;
@@ -18,6 +19,9 @@ public abstract class LivingBeing extends Entity {
         this.strength = strength;
         this.isAlive = true;
     }
+
+    @Override
+    public abstract void execute();
 
    //changing rooms
     public void move(Room destination) {
