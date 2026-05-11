@@ -1,11 +1,14 @@
 package Entities;
 
-import world.World;
 import StructuralElements.Room;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 import utilities.Coordinates;
-import utilities.Executable;
+import world.World;
 
-public class Zombie extends LivingBeing implements Executable {
+public class Zombie extends LivingBeing {
     private Room spawnRoom;
     private int respawnTimer;
     private boolean isRespawning;
@@ -15,7 +18,7 @@ public class Zombie extends LivingBeing implements Executable {
     private final int RESPAWN_TIME = 10;
 
     public Zombie(String name, World world, Coordinates coordinates,
-                   int health, int strength, Room spawnRoom) {
+                   int health, int strength, Room spawnRoom, Hero targetHero) {
         super(name, world, health, strength, coordinates); // ← было 50, теперь параметр
         this.spawnRoom = spawnRoom;
         this.respawnTimer = 0;
@@ -57,33 +60,41 @@ public class Zombie extends LivingBeing implements Executable {
             attack(hero);
             return;
         }
-
-        // ищем соседнюю комнату ближе к герою
-        Room best = null;
-        double bestDist = distance(currentRoom, heroRoom);
-
-        for (Room neighbor : currentRoom.getAccessibleRooms()) {
-            double d = distance(neighbor, heroRoom);
-            if (d < bestDist) {
-                bestDist = d;
-                best = neighbor;
-            }
-        }
-
-        if (best != null) {
-            move(best);
-            System.out.println(name + " движется в комнату #" + best.getIDroom());
+        // BFS чтобы найти следующий шаг к герою через открытые двери
+        Room nextStep = bfs(currentRoom, heroRoom);
+        if (nextStep != null) {
+            move(nextStep);
+            System.out.println(name + " движется в комнату #" + nextStep.getIDroom());
         } else {
             System.out.println(name + " не может добраться до героя!");
         }
     }
-
-    private double distance(Room a, Room b) {
-        int dx = a.getCoordinates().getX() - b.getCoordinates().getX();
-        int dy = a.getCoordinates().getY() - b.getCoordinates().getY();
-        return Math.sqrt(dx * dx + dy * dy);
+        // BFS to find the next step to the hero
+        private Room bfs(Room start, Room target) {
+            if (start.equals(target)) return null;
+            Map<Room, Room> cameFrom = new HashMap<>();
+            Queue<Room> queue = new LinkedList<>();
+            queue.add(start);
+            cameFrom.put(start, null);
+            while (!queue.isEmpty()) {
+                Room current = queue.poll();
+                if (current.equals(target)) {
+                    // идём назад чтобы найти первый шаг
+                    Room step = target; 
+                    while (!cameFrom.get(step).equals(start)) {
+                        step = cameFrom.get(step);
+                }
+                return step;
+            }
+            for (Room neighbor : current.getAccessibleRooms()) {
+                if (!cameFrom.containsKey(neighbor)) {
+                    cameFrom.put(neighbor, current);
+                    queue.add(neighbor);
+                }
+            }
+        }
+        return null; // путь не найден
     }
-    
 
     // cycle of life of zombie
     @Override

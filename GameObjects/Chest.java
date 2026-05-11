@@ -1,8 +1,8 @@
 package GameObjects;
 
-import utilities.Activatable;
 import java.util.ArrayList;
 import java.util.List;
+import utilities.Activatable;
 
 public class Chest extends GameObject implements Activatable {
     private boolean isLocked;
@@ -15,19 +15,30 @@ public class Chest extends GameObject implements Activatable {
         this.contents = new ArrayList<>();
     }
 
-    @Override
-    public boolean activate(GameObject item) {
-        if (isOpen) {
-            System.out.println("Chest is already open.");
-            return true;
-        }
-        
-        if (item instanceof Crowbar) {
-            return forceOpen();
-        }
+public Chest(String name, boolean isLocked, boolean isOpen) {
+    super(name, false);
+    this.isLocked = isLocked;
+    this.isOpen = isOpen;
+    this.contents = new ArrayList<>();
+}    
 
-        System.out.println("Chest is locked.");
-        return false;
+    @Override
+        public boolean activate(GameObject item) {
+            if (isOpen) {
+                System.out.println("Chest is already open.");
+                return true;
+            }
+            if (item instanceof Crowbar) {
+                return forceOpen();
+            }
+            if (item instanceof Key) {
+                this.isLocked = false;
+                this.isOpen = true;
+                System.out.println("Chest opened with key!");
+                return true;
+            }
+            System.out.println("Chest is locked.");
+            return false;
     }
 
     public boolean forceOpen() {
@@ -36,6 +47,10 @@ public class Chest extends GameObject implements Activatable {
         System.out.println("You've broke the chest using crowbar!");
         return true;
     }
+
+    public void addItem(GameObject item) {
+    contents.add(item);
+}
 
     public List<GameObject> takeAll() {
         if (!isOpen) {
