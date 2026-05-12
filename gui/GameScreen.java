@@ -38,6 +38,9 @@ public class GameScreen extends JPanel {
     private BufferedImage chestLockedSprite;
     private BufferedImage chestNotLockedSprite;
     private BufferedImage chestOpenSprite;
+    private BufferedImage heroLeftSprite;
+    private BufferedImage heroRightSprite;
+    private BufferedImage currentHeroSprite;
 
     private Set<Integer> pressedKeys = new HashSet<>();
     private double moveTimer = 0;
@@ -68,6 +71,9 @@ public class GameScreen extends JPanel {
             chestLockedSprite     = ImageIO.read(getClass().getResource("/images/chest_Locked.png"));
             chestNotLockedSprite  = ImageIO.read(getClass().getResource("/images/chest_notLocked.png"));
             chestOpenSprite       = ImageIO.read(getClass().getResource("/images/chest_Open.png"));
+            heroLeftSprite        = ImageIO.read(getClass().getResource("/images/hero_goesLeft.png"));
+            heroRightSprite       = ImageIO.read(getClass().getResource("/images/hero_goesRight.png"));
+            currentHeroSprite     = heroSprite;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -145,6 +151,15 @@ public class GameScreen extends JPanel {
         if (pressedKeys.contains(KeyEvent.VK_S) || pressedKeys.contains(KeyEvent.VK_DOWN))   dy =  1;
         if (pressedKeys.contains(KeyEvent.VK_D) || pressedKeys.contains(KeyEvent.VK_RIGHT))  dx =  1;
         if (pressedKeys.contains(KeyEvent.VK_A) || pressedKeys.contains(KeyEvent.VK_LEFT))   dx = -1;
+        // Меняем спрайт при движении
+        if (dx == 1) {
+            currentHeroSprite = heroRightSprite;
+        } else if (dx == -1) {
+            currentHeroSprite = heroLeftSprite;
+        } else if (dy != 0) {
+            currentHeroSprite = heroSprite;
+        }
+
         if (dx == 0 && dy == 0) return;
 
         for (Room neighbor : current.getAccessibleRooms()) {
@@ -207,19 +222,38 @@ public class GameScreen extends JPanel {
         }
     }
 
-    private void interactWithDoor() {
-        Room current = hero.getCurrentRoom();
-        if (current == null) return;
+private void interactWithDoor() {
+    Room current = hero.getCurrentRoom();
+    if (current == null) return;
 
-        for (Door door : current.getDoors()) {
-            if (door.isLocked() && hero.hasKey()) {
-                door.activate(hero.getKey());
-                hero.getInventory().remove(hero.getKey());
-                System.out.println("Door unlocked!");
-                break;
+    for (Door door : current.getDoors()) {
+        if (door.isLocked() && hero.hasKey()) {
+            Room other = door.getOtherRoom(current);
+            int otherCol = other.getCoordinates().getX();
+            int otherRow = other.getCoordinates().getY();
+            int curCol = current.getCoordinates().getX();
+            int curRow = current.getCoordinates().getY();
+
+            door.activate(hero.getKey());
+            hero.getInventory().remove(hero.getKey());
+            System.out.println("Door unlocked!");
+
+            //find the door in bigRoomDoors and mark it as open
+            for (int[] d : bigRoomDoors) {
+                int dRow = d[0];
+                int dCol = d[1];
+
+                //check if this is the door we just unlocked
+                if ((dRow == otherRow && dCol == otherCol) ||
+                    (dRow == curRow && dCol == curCol)) {
+                    d[2] = 0; //0 is open now
+                    break;
+                }
             }
+            break;
         }
     }
+}
 
     private void attackZombie() {
         Room current = hero.getCurrentRoom();
@@ -322,7 +356,7 @@ public class GameScreen extends JPanel {
             }
         }
 
-        //hero (только если не вышел)
+        //hero (if not dead and not won)
         if (!gameWon) {
             int hx = hero.getPosition().getX() * TILE_SIZE;
             int hy = hero.getPosition().getY() * TILE_SIZE;
@@ -330,7 +364,7 @@ public class GameScreen extends JPanel {
                 BufferedImage attackSprite = attackFacingRight ? heroAttackRightSprite : heroAttackLeftSprite;
                 g.drawImage(attackSprite, hx, hy, TILE_SIZE, TILE_SIZE, this);
             } else {
-                g.drawImage(heroSprite, hx, hy, TILE_SIZE, TILE_SIZE, this);
+                g.drawImage(currentHeroSprite, hx, hy, TILE_SIZE, TILE_SIZE, this);
             }
         }
 
@@ -343,7 +377,7 @@ public class GameScreen extends JPanel {
             }
         }
 
-        //панель справа
+        //panel on the right
         int panelX = COLS * TILE_SIZE + 10;
         g.setColor(new Color(0, 0, 0, 180));
         g.fillRect(COLS * TILE_SIZE, 0, getWidth() - COLS * TILE_SIZE, getHeight());
