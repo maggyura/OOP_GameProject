@@ -183,8 +183,8 @@ public class GameStarter {
 
         //первый сундук открытый - нож и crowbar
         Chest openChest = new Chest("Chest", false, true);
-        openChest.addItem(new Knife("Knife"));
-        openChest.addItem(new Crowbar("Crowbar"));
+        openChest.addItem(new Knife("Knife (SPACE)"));
+        openChest.addItem(new Crowbar("Crowbar (E)"));
         allRooms.get(0).addItem(openChest);
 
         //от 5 до 7 закрытых сундуков
@@ -192,9 +192,9 @@ public class GameStarter {
         for (int i = 1; i <= closedCount; i++) {
             Chest chest = new Chest("Chest", true);
             if (rand.nextBoolean()) {
-                chest.addItem(new FirstAidKit("First Aid Kit", 30));
+                chest.addItem(new FirstAidKit("First Aid Kit (H)", 30));
             } else {
-                chest.addItem(new Key("Key"));
+                chest.addItem(new Key("Key (E)"));
             }
             allRooms.get(i).addItem(chest);
         }

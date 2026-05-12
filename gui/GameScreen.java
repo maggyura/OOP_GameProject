@@ -31,13 +31,20 @@ public class GameScreen extends JPanel {
     private List<int[]> bigRoomDoors;
 
     private BufferedImage heroSprite;
+    private BufferedImage heroLeftSprite;
+    private BufferedImage heroRightSprite;
     private BufferedImage heroAttackLeftSprite;
     private BufferedImage heroAttackRightSprite;
+    private BufferedImage currentHeroSprite;
+
     private BufferedImage villainSprite;
+
     private BufferedImage floorSprite;
+
     private BufferedImage chestLockedSprite;
     private BufferedImage chestNotLockedSprite;
     private BufferedImage chestOpenSprite;
+
 
     private Set<Integer> pressedKeys = new HashSet<>();
     private double moveTimer = 0;
@@ -61,13 +68,22 @@ public class GameScreen extends JPanel {
 
         try {
             heroSprite            = ImageIO.read(getClass().getResource("/images/herogoesUporDown.png"));
+            heroLeftSprite   = ImageIO.read(getClass().getResource("/images/hero_goesLeft.png"));
+            heroRightSprite  = ImageIO.read(getClass().getResource("/images/hero_goesRight.png"));
+
             heroAttackLeftSprite  = ImageIO.read(getClass().getResource("/images/heroAttacksLeft.png"));
             heroAttackRightSprite = ImageIO.read(getClass().getResource("/images/heroAttacksRight.png"));
+            // it is set to the default sprite
+            currentHeroSprite = heroSprite;
+
             villainSprite         = ImageIO.read(getClass().getResource("/images/villain_goesRight.png"));
+
             floorSprite           = ImageIO.read(getClass().getResource("/images/floor_tile.png"));
+
             chestLockedSprite     = ImageIO.read(getClass().getResource("/images/chest_Locked.png"));
             chestNotLockedSprite  = ImageIO.read(getClass().getResource("/images/chest_notLocked.png"));
             chestOpenSprite       = ImageIO.read(getClass().getResource("/images/chest_Open.png"));
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -141,11 +157,33 @@ public class GameScreen extends JPanel {
         }
 
         int dx = 0, dy = 0;
-        if (pressedKeys.contains(KeyEvent.VK_W) || pressedKeys.contains(KeyEvent.VK_UP))    dy = -1;
-        if (pressedKeys.contains(KeyEvent.VK_S) || pressedKeys.contains(KeyEvent.VK_DOWN))   dy =  1;
-        if (pressedKeys.contains(KeyEvent.VK_D) || pressedKeys.contains(KeyEvent.VK_RIGHT))  dx =  1;
-        if (pressedKeys.contains(KeyEvent.VK_A) || pressedKeys.contains(KeyEvent.VK_LEFT))   dx = -1;
-        if (dx == 0 && dy == 0) return;
+        if (pressedKeys.contains(KeyEvent.VK_W) || pressedKeys.contains(KeyEvent.VK_UP)) {
+            dy = -1;
+        }
+        if (pressedKeys.contains(KeyEvent.VK_S) || pressedKeys.contains(KeyEvent.VK_DOWN)){
+            dy =  1;
+        }
+        if (pressedKeys.contains(KeyEvent.VK_D) || pressedKeys.contains(KeyEvent.VK_RIGHT)){
+            dx =  1;
+        }
+        if (pressedKeys.contains(KeyEvent.VK_A) || pressedKeys.contains(KeyEvent.VK_LEFT)){
+            dx = -1;
+        }
+
+        //changing hero's sprite according to user's key input
+        if (dx == 1){
+            currentHeroSprite = heroRightSprite;
+        }
+        if (dx == -1){
+            currentHeroSprite = heroLeftSprite;
+        }
+        if (dy != 0){
+            currentHeroSprite = heroSprite;
+        }
+
+        if (dx == 0 && dy == 0){
+            return;
+        }
 
         for (Room neighbor : current.getAccessibleRooms()) {
             int nx = neighbor.getCoordinates().getX() - current.getCoordinates().getX();
@@ -216,6 +254,17 @@ public class GameScreen extends JPanel {
                 door.activate(hero.getKey());
                 hero.getInventory().remove(hero.getKey());
                 System.out.println("Door unlocked!");
+
+                // changing color to green after unlocking
+                Room current2 = hero.getCurrentRoom();
+                int col = current2.getCoordinates().getX();
+                int row = current2.getCoordinates().getY();
+                for (int[] d : bigRoomDoors) {
+                    if (d[0] == row && d[1] == col) {
+                        d[2] = 0;
+                        break;
+                    }
+                }
                 break;
             }
         }
@@ -322,17 +371,6 @@ public class GameScreen extends JPanel {
             }
         }
 
-        //hero (только если не вышел)
-        if (!gameWon) {
-            int hx = hero.getPosition().getX() * TILE_SIZE;
-            int hy = hero.getPosition().getY() * TILE_SIZE;
-            if (isAttacking) {
-                BufferedImage attackSprite = attackFacingRight ? heroAttackRightSprite : heroAttackLeftSprite;
-                g.drawImage(attackSprite, hx, hy, TILE_SIZE, TILE_SIZE, this);
-            } else {
-                g.drawImage(heroSprite, hx, hy, TILE_SIZE, TILE_SIZE, this);
-            }
-        }
 
         //zombies
         for (LivingBeing being : world.getLivingBeings()) {
@@ -340,6 +378,24 @@ public class GameScreen extends JPanel {
                 int vx = being.getPosition().getX() * TILE_SIZE;
                 int vy = being.getPosition().getY() * TILE_SIZE;
                 g.drawImage(villainSprite, vx, vy, TILE_SIZE, TILE_SIZE, this);
+
+                // атака поверх зомби
+                if (isAttacking) {
+                    BufferedImage attackSprite = attackFacingRight ? heroAttackRightSprite : heroAttackLeftSprite;
+                    g.drawImage(attackSprite, vx, vy, TILE_SIZE, TILE_SIZE, this);
+                }
+            }
+        }
+        //hero (только если не вышел)
+        if (!gameWon) {
+            int hx = hero.getPosition().getX() * TILE_SIZE;
+            int hy = hero.getPosition().getY() * TILE_SIZE;
+            if (isAttacking) {
+                BufferedImage attackSprite = attackFacingRight ? heroAttackRightSprite : heroAttackLeftSprite;
+                g.drawImage(attackSprite, hx, hy, TILE_SIZE, TILE_SIZE, this);
+            }
+            else {
+                g.drawImage(currentHeroSprite, hx, hy, TILE_SIZE, TILE_SIZE, this);
             }
         }
 
