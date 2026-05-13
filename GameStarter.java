@@ -24,7 +24,7 @@ public class GameStarter {
     static Room[][] grid;
     static int doorId = 1;
     static boolean[][] isPartOfBigRoom;
-    //список входных клеток больших комнат
+    // array for the big rooms
     static List<int[]> bigRoomDoors = new ArrayList<>(); //row, col, locked
 
     public static void main(String[] args) {
@@ -42,12 +42,11 @@ public class GameStarter {
             }
         }
 
-        //ссначала размещаем большие комнаты
+        // we first place the big rooms
         placeBigRooms();
 
-        //потом генерируем лабиринт (пропускаем клетки больших комнат)
+        //Then we generate the labyrinth itself, skipping over the big rooms
         boolean[][] visited = new boolean[ROWS][COLS];
-        //помечаем все клетки больших комнат как посещённые кроме входа
         for (int row = 0; row < ROWS; row++) {
             for (int col = 0; col < COLS; col++) {
                 if (isPartOfBigRoom[row][col]) visited[row][col] = true;
@@ -55,7 +54,7 @@ public class GameStarter {
         }
         generateMaze(0, 0, visited);
 
-        //выходная комната после которой побюеда
+        //ExitRoom that leads to win screen
         Room exitRoom = new Room(id++, "Exit", new Coordinates(COLS, ROWS - 1));
         world.addRoom(exitRoom);
         new Door(doorId++, "Exit Door", grid[ROWS-1][COLS-1], exitRoom, null);
@@ -64,17 +63,17 @@ public class GameStarter {
 
         hero.move(grid[0][1]);
 
-        //zombi1 behind hero
+        //zombie1 behind hero
         Zombie z = new Zombie("Zombie", world, new Coordinates(0, 0), 50, 10, grid[0][0], hero);
         z.move(grid[0][0]);
         world.addLivingBeing(z);
 
-        //zombi 2 in the right top conrer, middle brother
+        //zombie 2 in the right top conrer, middle brother
         Zombie z2 = new Zombie("Zombie 2", world, new Coordinates(COLS-1, 0), 50, 10, grid[0][COLS-1], hero);
         z2.move(grid[0][COLS-1]);
         world.addLivingBeing(z2);
 
-        //zombi 3 in the center, stroger and hekthier than his brothers
+        //zombie 3 in the center, stroger and hekthier than his brothers
         Zombie z3 = new Zombie("Zombie 3", world, new Coordinates(COLS/2, ROWS/2), 70, 12, grid[ROWS/2][COLS/2], hero);
         z3.move(grid[ROWS/2][COLS/2]);
         world.addLivingBeing(z3);
@@ -97,13 +96,13 @@ public class GameStarter {
 
         while (placed < 5 && attempts < 200) {
             attempts++;
-            //размер 3х3 или 4x4
+            //3x3 or 4x4
             int size = rand.nextBoolean() ? 3 : 4;
-            //рандомная позиция (не у края и не у старта героя) хотя можно подумать
+            //random position(not the start of the game )
             int startRow = 3 + rand.nextInt(ROWS - size - 4);
             int startCol = 3 + rand.nextInt(COLS - size - 4);
 
-            //проверяем что место свободно
+            //checking if the space is free
             boolean free = true;
             for (int r = startRow - 1; r <= startRow + size; r++) {
                 for (int c = startCol - 1; c <= startCol + size; c++) {
@@ -115,14 +114,14 @@ public class GameStarter {
             }
             if (!free) continue;
 
-            //помечаем клетки как часть большой комнаты
+            //marking cells as a part of a big room
             for (int r = startRow; r < startRow + size; r++) {
                 for (int c = startCol; c < startCol + size; c++) {
                     isPartOfBigRoom[r][c] = true;
                 }
             }
 
-            //соединяем все внутренние клетки открытыми дверями
+            //connecting the inner corridors to open doors
             for (int r = startRow; r < startRow + size; r++) {
                 for (int c = startCol; c < startCol + size; c++) {
                     if (c + 1 < startCol + size) {
@@ -134,19 +133,20 @@ public class GameStarter {
                 }
             }
 
-            //добавляем вход (открытый) и выход (закрытый на ключ)
+            // exit and entrance doors creation
             int entryRow = startRow;
             int entryCol = startCol - 1;
             if (entryCol >= 0) {
                 new Door(doorId++, "Door", grid[entryRow][entryCol], grid[entryRow][startCol], null);
-                bigRoomDoors.add(new int[]{entryRow, startCol, 0}); // 0 = открытая
+                bigRoomDoors.add(new int[]{entryRow, startCol, 0}); // 0 = open
             }
 
-            // выход - правая нижняя клетка, закрытая на ключ
+
             int exitRow = startRow + size - 1;
             int exitCol = startCol + size;
             if (exitCol < COLS) {
-                new Door(doorId++, "Door", grid[exitRow][startCol + size - 1], grid[exitRow][exitCol], new Lock(true));                bigRoomDoors.add(new int[]{exitRow, exitCol, 1}); // 1 = закрытая
+                new Door(doorId++, "Door", grid[exitRow][startCol + size - 1], grid[exitRow][exitCol], new Lock(true));
+                bigRoomDoors.add(new int[]{exitRow, exitCol, 1}); // 1 = closed; it didnt work we couldnt figure out why
             }
 
             placed++;
@@ -181,13 +181,13 @@ public class GameStarter {
         }
         Collections.shuffle(allRooms);
 
-        //первый сундук открытый - нож и crowbar
+        //the first open chest with a knife and a crowbar
         Chest openChest = new Chest("Chest", false, true);
         openChest.addItem(new Knife("Knife"));
         openChest.addItem(new Crowbar("Crowbar"));
         allRooms.get(0).addItem(openChest);
 
-        //от 5 до 7 закрытых сундуков
+        //from 5 to 7 random closed chests
         int closedCount = 8 + rand.nextInt(5);
         for (int i = 1; i <= closedCount; i++) {
             Chest chest = new Chest("Chest", true);

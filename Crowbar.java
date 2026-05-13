@@ -1,0 +1,76 @@
+package GameObjects;
+
+import java.util.ArrayList;
+import java.util.List;
+import utilities.Activatable;
+
+public class Chest extends GameObject implements Activatable {
+    private boolean isLocked;
+    private boolean isOpen;
+    private List<GameObject> contents;
+    public Chest(String name, boolean isLocked) {
+        super(name, false);
+        this.isLocked = isLocked;
+        this.isOpen = false;
+        this.contents = new ArrayList<>();
+    }
+
+public Chest(String name, boolean isLocked, boolean isOpen) {
+    super(name, false);
+    this.isLocked = isLocked;
+    this.isOpen = isOpen;
+    this.contents = new ArrayList<>();
+}    
+
+    @Override
+        public boolean activate(GameObject item) {
+            if (isOpen) {
+                System.out.println("Chest is already open.");
+                return true;
+            }
+            if (item instanceof Crowbar) {
+                return forceOpen();
+            }
+            if (item instanceof Key) {
+                this.isLocked = false;
+                this.isOpen = true;
+                System.out.println("Chest opened with key!");
+                return true;
+            }
+            System.out.println("Chest is locked.");
+            return false;
+    }
+
+    public boolean forceOpen() {
+        this.isLocked = false;
+        this.isOpen = true;
+        System.out.println("You've broke the chest using crowbar!");
+        return true;
+    }
+
+    public void addItem(GameObject item) {
+    contents.add(item);
+}
+
+    public List<GameObject> takeAll() {
+        if (!isOpen) {
+            System.out.println("The chest is closed.");
+            return new ArrayList<>();
+        }
+        if (contents.isEmpty()) {
+            System.out.println("The chest is empty.");
+            return new ArrayList<>();
+        }
+        List<GameObject> items = new ArrayList<>(contents);
+        contents.clear();
+        return items;
+    
+}
+
+    public boolean isOpen()   {
+        return isOpen;
+    }
+    public boolean isLocked() {
+        return isLocked;
+    }
+}
